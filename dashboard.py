@@ -6,13 +6,23 @@ import requests
 from datetime import datetime, timedelta
 import numpy as np
 import base64
+import os
+
+# Ticker to logo filename mapping
+TICKER_LOGO_MAP = {
+    "AAPL": "apple.jpeg",
+    "GOOGL": "google.jpeg",
+    "NVDA": "nvidia.jpeg",
+    "TSLA": "tesla.jpeg",
+    "MSFT": "microsoft.jpeg"
+}
 
 # Page config
 st.set_page_config(
     page_title="Stock Analysis Dashboard",
     page_icon="📈",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded"   # <-- optional
 )
 
 # Constants
@@ -113,17 +123,103 @@ def fetch_daily_stats(start_date, end_date):
         st.error(f"Error fetching daily statistics: {str(e)}")
         return []
 
-# Custom CSS
-st.markdown("""
+# Custom CSS (add padding-bottom for footer)
+# st.markdown("""
+#     <style>
+#     .main {
+#         background-color: #1a1a1a;
+#         color: white;
+#     }
+#     .stApp {
+#         max-width: 1200px;
+#         margin: 0 auto;
+#         padding-bottom: 70px !important;
+#     }
+#     .metric-card {
+#         background-color: #2d2d2d;
+#         border-radius: 8px;
+#         padding: 16px;
+#         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+#         color: white;
+#         margin-bottom: 20px;
+#     }
+#     .metric-card h3 {
+#         color: #a3a3a3;
+#         font-size: 14px;
+#         margin-bottom: 8px;
+#         font-weight: normal;
+#     }
+#     .metric-card h2 {
+#         color: white;
+#         font-size: 24px;
+#         margin: 0;
+#         font-weight: bold;
+#     }
+#     .company-header {
+#         font-size: 24px;
+#         font-weight: bold;
+#         margin-bottom: 20px;
+#         color: white;
+#         display: flex;
+#         align-items: center;
+#         gap: 15px;
+#     }
+#     .company-logo {
+#         width: 40px;
+#         height: 40px;
+#         border-radius: 5px;
+#         object-fit: contain;
+#     }
+#     .positive-value {
+#         color: #00C805 !important;
+#     }
+#     .negative-value {
+#         color: #FF5B5B !important;
+#     }
+#     .footer-flex {
+#         position: fixed;
+#         left: 0;
+#         right: 0;
+#         bottom: 0;
+#         background: #181818;
+#         color: #aaa;
+#         font-size: 0.95em;
+#         z-index: 100;
+#         padding: 10px 24px 10px 24px;
+#         border-top: 1px solid #333;
+#         display: flex;
+#         justify-content: space-between;
+#         align-items: center;
+#     }
+#     .footer-flex a {
+#         color: #aaa;
+#         text-decoration: underline;
+#         margin: 0 8px;
+#     }
+#     </style>
+# """, unsafe_allow_html=True)
+
+
+st.markdown(
+    """
     <style>
+    /* Hide the redundant collapsed‐sidebar toggle on the far left */
+    button[data-testid="collapsedControl"] {
+        display: none !important;
+    }
+
+    /* App background */
     .main {
         background-color: #1a1a1a;
         color: white;
     }
-    .stApp {
-        max-width: 1200px;
-        margin: 0 auto;
+
+    /* Ensure footer has bottom padding */
+    .stApp > footer {
+        padding-bottom: 70px !important;
     }
+
+    /* Metric card styling */
     .metric-card {
         background-color: #2d2d2d;
         border-radius: 8px;
@@ -144,6 +240,8 @@ st.markdown("""
         margin: 0;
         font-weight: bold;
     }
+
+    /* Company header */
     .company-header {
         font-size: 24px;
         font-weight: bold;
@@ -159,52 +257,91 @@ st.markdown("""
         border-radius: 5px;
         object-fit: contain;
     }
+
+    /* Positive/negative value coloring */
     .positive-value {
         color: #00C805 !important;
     }
     .negative-value {
         color: #FF5B5B !important;
     }
+
+    /* Footer bar */
+    .footer-flex {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #181818;
+        color: #aaa;
+        font-size: 0.95em;
+        z-index: 100;
+        padding: 10px 24px 10px 24px;
+        border-top: 1px solid #333;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .footer-flex a {
+        color: #aaa;
+        text-decoration: underline;
+        margin: 0 8px;
+    }
     </style>
-""", unsafe_allow_html=True)
+    """,
+    unsafe_allow_html=True
+)
 
 # Main dashboard
 st.title("📊 Stock Analysis Dashboard")
 
-# Sidebar controls
-st.sidebar.header("📅 Date Range")
-time_range = fetch_time_range()
-start_date = st.sidebar.date_input(
-    "Start Date",
-    value=datetime.strptime(DEFAULT_START_DATE, "%Y-%m-%d"),
-    min_value=datetime.strptime(time_range["start_date"], "%Y-%m-%d"),
-    max_value=datetime.strptime(time_range["end_date"], "%Y-%m-%d")
-)
-end_date = st.sidebar.date_input(
-    "End Date",
-    value=datetime.strptime(DEFAULT_END_DATE, "%Y-%m-%d"),
-    min_value=datetime.strptime(time_range["start_date"], "%Y-%m-%d"),
-    max_value=datetime.strptime(time_range["end_date"], "%Y-%m-%d")
+# GitHub badge/link at the top
+st.markdown(
+    '''
+    <a href="https://github.com/pranav-gilda/stock-analysis-dashboard" target="_blank" style="text-decoration:none;">
+        <img src="https://img.shields.io/badge/GitHub-Repo-blue?logo=github" alt="GitHub Repo" style="height:28px;"/>
+    </a>
+    ''',
+    unsafe_allow_html=True
 )
 
-st.sidebar.header("🏢 Company Selection")
-companies = fetch_companies()
-if not companies:
-    st.error("No companies available. Please check your API connection.")
-    st.stop()
+# Sidebar - All sidebar elements consolidated here
+with st.sidebar:
+    st.header("📅 Date Range")
+    time_range = fetch_time_range()
+    start_date = st.date_input(
+        "Start Date",
+        value=datetime.strptime(DEFAULT_START_DATE, "%Y-%m-%d"),
+        min_value=datetime.strptime(time_range["start_date"], "%Y-%m-%d"),
+        max_value=datetime.strptime(time_range["end_date"], "%Y-%m-%d")
+    )
+    end_date = st.date_input(
+        "End Date",
+        value=datetime.strptime(DEFAULT_END_DATE, "%Y-%m-%d"),
+        min_value=datetime.strptime(time_range["start_date"], "%Y-%m-%d"),
+        max_value=datetime.strptime(time_range["end_date"], "%Y-%m-%d")
+    )
 
-company_symbols = [company["symbol"] for company in companies]
-selected_company = st.sidebar.selectbox(
-    "Select Company",
-    company_symbols,
-    index=0
-)
+    st.header("🏢 Company Selection")
+    companies = fetch_companies()
+    if not companies:
+        st.error("No companies available. Please check your API connection.")
+        st.stop()
 
-# Display company logo in sidebar
-try:
-    st.sidebar.image(f"{selected_company}.jpeg", width=100, use_container_width=False)
-except Exception as e:
-    pass  # Skip if logo not found
+    company_symbols = [company["symbol"] for company in companies]
+    selected_company = st.selectbox(
+        "Select Company",
+        company_symbols,
+        index=0
+    )
+
+    # Display company logo in sidebar with correct mapping and fallback
+    logo_file = TICKER_LOGO_MAP.get(selected_company)
+    logo_path = f"logos/{logo_file}" if logo_file else None
+    if logo_path and os.path.exists(logo_path):
+        st.image(logo_path, width=100)
+    else:
+        st.markdown('<span style="font-size:2em;">📈</span>', unsafe_allow_html=True)
 
 # Get company name for display
 company_name = next((company["company"] for company in companies if company["symbol"] == selected_company), selected_company)
@@ -493,4 +630,27 @@ with tab3:
         
         st.plotly_chart(fig, use_container_width=True)
     else:
-        st.error("No daily statistics available for the selected period") 
+        st.error("No daily statistics available for the selected period")
+
+# Footer: GitHub left, sources center, created by right
+st.markdown(
+    """
+    <div class="footer-flex">
+        <div>
+            <a href="https://github.com/pranav-gilda/stock-analysis-dashboard" target="_blank">GitHub Repo</a>
+        </div>
+        <div>
+            Data sources:
+            <a href="https://ranaroussi.github.io/yfinance/" target="_blank">Yahoo Finance</a> |
+            <a href="https://www.gdeltproject.org/" target="_blank">GDELT</a>
+        </div>
+        <div>
+            Created by
+            <a href="https://www.linkedin.com/in/pranavgilda/" target="_blank">Pranav Gilda</a>,
+            <a href="https://www.linkedin.com/in/ramesh-keshav/" target="_blank">Keshav Ramesh</a>,
+            <a href="https://www.linkedin.com/in/rakesh-prasanna/" target="_blank">Rakesh Prasanna</a>
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True
+) 
