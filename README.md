@@ -12,6 +12,19 @@ A comprehensive stock analysis platform that combines financial data with news s
 - Heatmap visualization of sentiment across companies
 - Daily statistics and trend analysis
 
+## Demo
+
+Here’s a preview(screenshots) of the dashboard and insights:
+
+![Dashboard Overview](screens/dashboard_overview.png) 
+![Sentiment Heatmap](screens/jan_sentiment_heatmap.png)
+![TSLA January Sentiment vs Article Count](screens/tsla_jan_sentiment.png)
+![TSLA January OHLCV Candlestick Chart](screens/tsla_jan_ohlcv.png)
+
+## Motivation
+
+This project was built as part of a graduate-level course on Managing Big Data. It showcases a real-world data engineering pipeline from data ingestion to analytics visualization. Technologies used are production-grade and aligned with industry practices for financial analytics platforms.
+
 ## Tech Stack
 
 - **Backend**: FastAPI, MongoDB
@@ -34,7 +47,7 @@ A comprehensive stock analysis platform that combines financial data with news s
 
 - `combined_analysis_jan_june_2024.csv` - Combined stock and sentiment data
 - `ohlcv_data_jan_june_2024.csv` - Historical stock price data
-- Company logo images (apple.jpeg, google.jpeg, etc.)
+- `logos/` - Directory containing company logo images (apple.jpeg, google.jpeg, etc.)
 
 ## Setup Instructions
 
@@ -101,10 +114,18 @@ The dashboard will be available at `http://localhost:8501`
 4. Push to the branch
 5. Create a Pull Request
 
-## License
+## Future Enhancements
 
-[Add your license information here]
+- Use Doc2Vec or FinBERT for more accurate sentiment scoring
+- Deploy backend and dashboard with Docker & CI/CD
+- Add user-uploaded ticker support via web form
+- Integrate a vector database for efficient DocEmbed querying
 
-## Contact
 
-[Add your contact information here] 
+## 📬 Contact
+
+- **Email**: [pranav1gilda@gmail.com](mailto:pranav1gilda@gmail.com)  
+- **GitHub**: [@pranav-gilda](https://github.com/pranav-gilda)  
+- **LinkedIn**: [Pranav Gilda](https://www.linkedin.com/in/pranavgilda/)  
+
+> 💬 Feel free to open an issue or drop me a line!
