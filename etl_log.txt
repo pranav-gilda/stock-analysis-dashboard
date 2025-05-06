@@ -1,0 +1,9 @@
+Log file for the dates of mongodb saves:
+20240111: Inserted=0, Duplicates=1754, Time=3.71 min
+20240112: Inserted=1287, Duplicates=289, Time=4.01 min
+20240113: Inserted=524, Duplicates=215, Time=3.44 min
+20240114: Inserted=347, Duplicates=205, Time=3.27 min
+20240115: Inserted=970, Duplicates=219, Time=3.81 min
+20240116: Inserted=2535, Duplicates=338, Time=4.03 min
+20240117: Inserted=2084, Duplicates=333, Time=3.72 min
+20240118: Inserted=2435, Duplicates=338, Time=3.53 min

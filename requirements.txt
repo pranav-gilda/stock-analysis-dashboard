@@ -1,0 +1,14 @@
+boto3
+pymongo
+python-dotenv
+streamlit
+plotly
+numpy
+pandas
+requests
+fastapi
+pydantic
+pytz
+uvicorn
+textblob
+yfinance
